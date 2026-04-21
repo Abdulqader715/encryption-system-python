@@ -1,4 +1,4 @@
-Import streamlit as st
+import streamlit as st
 from cryptography.fernet import Fernet
 
 # 1. إعدادات الصفحة والتصميم (CSS)
