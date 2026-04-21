@@ -5,38 +5,46 @@ from audio_recorder_streamlit import audio_recorder
 # 1. إعدادات الصفحة
 st.set_page_config(page_title="نظام تشفير", page_icon="🔐")
 
-# 2. التنسيقات وإظهار زر القائمة الجانبية بشكل "عائم"
+# 2. التنسيقات لجعل السهم بارزاً جداً وحذف الزوائد
 st.markdown("""
     <style>
-    /* جعل زر القائمة الجانبية ظاهراً وعائماً بلون أزرق */
+    /* جعل سهم القائمة الجانبية بارزاً جداً وكبيراً */
     [data-testid="stSidebarCollapsedControl"] {
         visibility: visible !important;
-        background-color: #0d47a1 !important;
+        background-color: #0d47a1 !important; /* لون أزرق غامق بارز */
         color: white !important;
         border-radius: 50% !important;
-        width: 50px !important;
-        height: 50px !important;
-        top: 20px !important;
-        left: 20px !important;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
+        width: 60px !important;
+        height: 60px !important;
+        top: 15px !important;
+        left: 15px !important;
+        box-shadow: 0 0 15px rgba(13, 71, 161, 0.6) !important;
         display: flex !important;
         justify-content: center !important;
         align-items: center !important;
+        border: 2px solid white !important;
     }
     
-    /* إخفاء شعارات Streamlit والتاج الأحمر */
+    /* تكبير أيقونة السهم داخل الزر */
+    [data-testid="stSidebarCollapsedControl"] svg {
+        width: 35px !important;
+        height: 35px !important;
+    }
+
+    /* إخفاء الزوائد وشعار سترمليت */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
     .viewerBadge_container__1QSob { display: none !important; }
-    
+    div[data-testid="stStatusWidget"] { visibility: hidden; }
+
     /* خلفية التطبيق */
     .stApp { background-color: #f8f9fa; }
     
-    /* تنسيق العنوان */
-    h1 { color: #0d47a1 !important; text-align: center; font-size: 26px !important; margin-top: 20px; }
+    /* تنسيق العنوان الرئيسي */
+    h1 { color: #0d47a1 !important; text-align: center; font-size: 28px !important; margin-top: 30px; font-weight: bold; }
     
-    /* اسم عبد القادر في الأسفل بشكل ثابت واحترافي */
+    /* التذييل الثابت باسم عبد القادر */
     .abdulqader-footer {
         position: fixed;
         left: 0;
@@ -45,30 +53,31 @@ st.markdown("""
         background-color: #ffffff;
         color: #0d47a1;
         text-align: center;
-        padding: 12px;
+        padding: 15px;
         font-weight: bold;
-        border-top: 2px solid #0d47a1;
-        z-index: 9999;
-        font-size: 15px;
+        border-top: 3px solid #0d47a1;
+        z-index: 999999;
+        font-size: 16px;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
     }
     
-    /* تحسين شكل الأزرار */
+    /* تنسيق الأزرار */
     .stButton>button {
         background: linear-gradient(45deg, #1e88e5, #0d47a1);
-        color: white; border-radius: 12px; font-weight: bold; width: 100%;
+        color: white; border-radius: 12px; font-weight: bold; width: 100%; height: 3.2em;
     }
     </style>
     """, unsafe_allow_html=True)
 
 # 3. القائمة الجانبية
 with st.sidebar:
-    st.markdown("### 🔑 إعدادات الأمان")
-    user_key = st.text_input("ضع مفتاحك هنا:", type="password")
+    st.markdown("## ⚙️ الإعدادات")
+    user_key = st.text_input("مفتاح الأمان الخاص بك:", type="password")
     st.markdown("---")
     if st.button("توليد مفتاح جديد"):
         new_k = Fernet.generate_key().decode()
+        st.success("انسخ المفتاح واحفظه:")
         st.code(new_k)
-        st.caption("احفظ هذا الكود لاستخدامه دائماً")
 
 # 4. محتوى التطبيق
 st.title("🛡️ نظام تشفير")
@@ -76,36 +85,35 @@ st.title("🛡️ نظام تشفير")
 if user_key:
     try:
         cipher = Fernet(user_key.encode())
-        tab1, tab2 = st.tabs(["📝 نصوص", "🎙️ صوت"])
+        tab1, tab2 = st.tabs(["📝 النصوص", "🎙️ الصوت"])
 
         with tab1:
-            msg = st.text_area("النص المراد حمايته:", height=100)
+            msg = st.text_area("أدخل الرسالة:", height=120)
             if st.button("تشفير النص"):
                 if msg:
                     st.code(cipher.encrypt(msg.encode()).decode())
             
             st.markdown("---")
-            enc_input = st.text_area("الكود المراد فكه:", height=100)
-            if st.button("فك التشفير"):
+            enc_input = st.text_area("ضع الكود لفك التشفير:", height=120)
+            if st.button("إظهار النص الأصلي"):
                 try:
-                    st.success(f"الرسالة الأصلية: {cipher.decrypt(enc_input.encode()).decode()}")
+                    st.success(f"الرسالة: {cipher.decrypt(enc_input.encode()).decode()}")
                 except:
-                    st.error("المفتاح أو الكود خطأ")
+                    st.error("خطأ: المفتاح أو الكود غير صحيح")
 
         with tab2:
-            st.write("سجل صوتك:")
+            st.write("سجل صوتك هنا:")
             audio = audio_recorder(text="", icon_size="3x", neutral_color="#0d47a1")
             if audio:
                 st.audio(audio)
-                if st.button("حماية الصوت"):
-                    st.download_button("تحميل الملف المشفر", cipher.encrypt(audio), file_name="secret.bin")
+                if st.button("تشفير وحفظ الصوت"):
+                    st.download_button("تحميل الملف المشفر", cipher.encrypt(audio), file_name="secret_voice.bin")
     except:
-        st.error("مفتاح الأمان غير صالح")
+        st.error("المفتاح غير صالح")
 else:
-    # رسالة تنبيه واضحة
-    st.info("👋 أهلاً بك! اضغط على الدائرة الزرقاء في أعلى اليسار لوضع مفتاح الأمان.")
+    st.info("💡 اضغط على الزر الدائري الأزرق البارز (أعلى اليسار) للبدء.")
 
-# التوقيع
+# التوقيع الثابت
 st.markdown("""
     <div class="abdulqader-footer">
         Developed by: Abdulqader 🚀 | 2026
