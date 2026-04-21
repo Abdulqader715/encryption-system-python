@@ -104,6 +104,6 @@ else:
 # التوقيع النهائي
 st.markdown("""
     <div class="abdulqader-footer">
-        Developed by: Abdulqader 🚀 | 2026
+        Developed by: Abdulqader | 2026
     </div>
     """, unsafe_allow_html=True)
